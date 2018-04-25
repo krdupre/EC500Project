@@ -1,6 +1,10 @@
 #include <iostream>
 #include <fstream>
 
+#ifndef h
+#define h 1.0
+#endif
+
 using namespace std;
 
 void writet(double** phi, double time)
@@ -14,7 +18,7 @@ void writet(double** phi, double time)
     {
 	for (j = 0; j < N; j++)
 	{
-	    file << i << "\t" << j << "\t" << phi[i][j] << "\n";
+	    file << h*i << "\t" << h*j << "\t" << phi[i][j] << "\n";
 	}
     }
     file.close();

@@ -1,5 +1,6 @@
 #define g 9.81
 #define N 256
+#define h 1.0
 
 #include "saint_venant.h"
 #include "array_copy.h"
@@ -44,8 +45,6 @@ int main(int argv, char** argc)
     }
 
     int Nt = (int) time/dt;
-
-    //writet(eta_o,0.0);
 
     for (i = 0; i < Nt+1; i++)
     {
