@@ -28,7 +28,6 @@ int main(int argv, char** argc)
 	v_o[i] = new double [N];
 	u_n[i] = new double [N];
 	v_n[i] = new double [N];
-
 	for (j = 0; j < N; j++)
 	{
 	    eta_o[i][j] = 1.0;
@@ -40,6 +39,7 @@ int main(int argv, char** argc)
 	for (j = 0; j < N; j++)
 	{
 	    u_n[i][j] = 0.0;
+	    v_n[i][j] = 0.0;
 	}
     }
 
@@ -49,8 +49,8 @@ int main(int argv, char** argc)
 
     for (i = 0; i < Nt+1; i++)
     {
-	momentum(eta_o,eta_n,u_o,v_o,dt);
-	saint_venant(u_o,u_n,eta_o,eta_n,v_o,v_n,dt);
+	momentum(eta_o,eta_n,u_o,v_o,dt,0,N);
+	saint_venant(u_o,u_n,eta_o,eta_n,v_o,v_n,dt,0,N);
 
 	a_copy(eta_n,eta_o);
 	a_copy(u_n,u_o);

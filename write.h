@@ -8,7 +8,7 @@ void writet(double** phi, double time)
     int i,j;
 
     ofstream file;
-    file.open(to_string ((int) time) + ".dat");
+    file.open("data." + to_string ((int) time));
     file.precision(6);
     for (i = 0; i < N; i++)
     {
