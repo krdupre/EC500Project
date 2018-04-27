@@ -38,6 +38,8 @@ void runSerial(double time, double dt, int N_write)
 
     int Nt = (int) time/dt;
 
+    chrono::time_point<chrono::steady_clock> begin_time = chrono::steady_clock::now(); 
+
     for (i = 0; i < Nt+1; i++)
     {
 	momentum(eta_o,eta_n,u_o,v_o,dt,0,N);
@@ -52,12 +54,20 @@ void runSerial(double time, double dt, int N_write)
 	    writet(eta_o, dt*i*10);
 	}
     }
+
+    chrono::time_point<chrono::steady_clock>end_time = chrono::steady_clock::now();
+    chrono::duration<double>difference_in_time = end_time - begin_time;
+    double runTime = difference_in_time.count();
+
+    printf("Run took %f seconds.\n", runTime);
 }
 
 void runParallel(double time, double dt, int N_write)
 {
     int i,j;
     int N_proc,PID;
+
+    double max_time;
 
     double** eta_o = new double* [N];
     double** u_o = new double* [N];
@@ -107,7 +117,9 @@ void runParallel(double time, double dt, int N_write)
     {
 	m1 = n_ex + PID*M;
 	m2 = n_ex + (PID+1)*M;
-    } 
+    }
+
+    chrono::time_point<chrono::steady_clock> begin_time = chrono::steady_clock::now(); 
 
     for (i = 0; i < Nt+1; i++)
     {
@@ -127,6 +139,18 @@ void runParallel(double time, double dt, int N_write)
 	    	writet(eta_o, dt*i*10);
 	    }
 	}
+	MPI_Barrier(MPI_COMM_WORLD);
+    }
+
+    chrono::time_point<chrono::steady_clock>end_time = chrono::steady_clock::now();
+    chrono::duration<double>difference_in_time = end_time - begin_time;
+    double runTime = difference_in_time.count();
+
+    MPI_Allreduce(&runTime, &max_time, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+
+    if (PID == 0)
+    {
+	printf("Number of processes: %d, Time: %f seconds\n", N_proc, max_time);
     }
 
     MPI_Finalize();
