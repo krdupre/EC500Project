@@ -5,7 +5,7 @@
 #include "array_copy.h"
 #include "write.h"
 
-void runSerial(double time, double dt, int N_write)
+void runSerial(double time, double dt, int N_write, double** init)
 {
     int i,j;
 
@@ -26,10 +26,13 @@ void runSerial(double time, double dt, int N_write)
 	v_n[i] = new double [N];
 	for (j = 0; j < N; j++)
 	{
-	    eta_o[i][j] = 1.0;
+	    eta_o[i][j] = init[2][0];
 	}
     }
-    eta_o[N/2][N/2] += 0.5;
+    for(i = 1; i <= init[0][2]; i++)    
+    {
+	eta_o[(int)init[0][i]][(int)init[1][i]] = init[2][i];
+    }
     for (i = 0; i < N; i++)
     {
 	for (j = 0; j < N; j++)
@@ -65,7 +68,7 @@ void runSerial(double time, double dt, int N_write)
     printf("Run took %f seconds.\n", runTime);
 }
 
-void runParallel(double time, double dt, int N_write, int argc, char** argv)
+void runParallel(double time, double dt, int N_write, int argc, char** argv, double** init)
 {
     int i,j;
     int N_proc,PID;
@@ -89,10 +92,13 @@ void runParallel(double time, double dt, int N_write, int argc, char** argv)
 	v_n[i] = new double [N];
 	for (j = 0; j < N; j++)
 	{
-	    eta_o[i][j] = 1.0;
+	    eta_o[i][j] = init[2][0];
 	}
     }
-    eta_o[N/2][N/2] += 0.5;
+    for(i = 1; i <= init[0][2]; i++)    
+    {
+	eta_o[(int)init[0][i]][(int)init[1][i]] = init[2][i];
+    }
     for (i = 0; i < N; i++)
     {
 	for (j = 0; j < N; j++)
