@@ -1,3 +1,6 @@
+#include <mpi.h>
+#include <chrono>
+
 #include "saint_venant.h"
 #include "array_copy.h"
 #include "write.h"
@@ -62,7 +65,7 @@ void runSerial(double time, double dt, int N_write)
     printf("Run took %f seconds.\n", runTime);
 }
 
-void runParallel(double time, double dt, int N_write)
+void runParallel(double time, double dt, int N_write, int argc, char** argv)
 {
     int i,j;
     int N_proc,PID;
@@ -117,6 +120,10 @@ void runParallel(double time, double dt, int N_write)
     {
 	m1 = n_ex + PID*M;
 	m2 = n_ex + (PID+1)*M;
+    }
+    if (PID == N_proc-1)
+    {
+	m2 -= 1;
     }
 
     chrono::time_point<chrono::steady_clock> begin_time = chrono::steady_clock::now(); 
