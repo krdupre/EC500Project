@@ -1,6 +1,6 @@
 #define g 9.81
 #define N 256
-#define h 1.0
+#define L 1.0
 
 #include "run.h"
 
@@ -9,7 +9,7 @@ int main(int argv, char** argc)
     int i;
 
     double time = 1.0;
-    double dt = 0.0001;
+    double dt = 0.001;
     int N_write = 100;
 
     int points = 1; //number of initialized points

@@ -29,9 +29,9 @@ void runSerial(double time, double dt, int N_write, double** init)
 	    eta_o[i][j] = init[2][0];
 	}
     }
-    for(i = 1; i <= init[0][2]; i++)    
+    for(i = 1; i < (int) init[0][0]+1; i++)    
     {
-	eta_o[(int)init[0][i]][(int)init[1][i]] = init[2][i];
+	eta_o[(int)init[0][i]][(int)init[1][i]] += init[2][i];
     }
     for (i = 0; i < N; i++)
     {
@@ -95,9 +95,9 @@ void runParallel(double time, double dt, int N_write, int argc, char** argv, dou
 	    eta_o[i][j] = init[2][0];
 	}
     }
-    for(i = 1; i <= init[0][2]; i++)    
+    for(i = 1; i < (int) init[0][0]+1; i++)    
     {
-	eta_o[(int)init[0][i]][(int)init[1][i]] = init[2][i];
+	eta_o[(int)init[0][i]][(int)init[1][i]] += init[2][i];
     }
     for (i = 0; i < N; i++)
     {
@@ -127,10 +127,6 @@ void runParallel(double time, double dt, int N_write, int argc, char** argv, dou
 	m1 = n_ex + PID*M;
 	m2 = n_ex + (PID+1)*M;
     }
-    if (PID == N_proc-1)
-    {
-	m2 -= 1;
-    }
 
     chrono::time_point<chrono::steady_clock> begin_time = chrono::steady_clock::now(); 
 
@@ -138,6 +134,7 @@ void runParallel(double time, double dt, int N_write, int argc, char** argv, dou
     {
 	momentum(eta_o,eta_n,u_o,v_o,dt,m1,m2);
 	MPI_Barrier(MPI_COMM_WORLD);
+
 	saint_venant(u_o,u_n,eta_o,eta_n,v_o,v_n,dt,m1,m2);
 	MPI_Barrier(MPI_COMM_WORLD);
 
