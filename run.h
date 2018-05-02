@@ -77,7 +77,8 @@ void runParallel(double time, double dt, int N_write, int argc, char** argv, dou
 
     double** eta_o = new double* [N];
     double** u_o = new double* [N];
-    double** eta_n = new double* [N];
+    double** eta_l = new double* [N];
+    double** eta_g = new double* [N];
     double** u_n = new double* [N];
     double** v_o = new double* [N];
     double** v_n = new double* [N];
@@ -86,7 +87,8 @@ void runParallel(double time, double dt, int N_write, int argc, char** argv, dou
     {
 	eta_o[i] = new double [N];
 	u_o[i] = new double [N];
-	eta_n[i] = new double [N];
+	eta_l[i] = new double [N];
+	eta_g[i] = new double [N];
 	v_o[i] = new double [N];
 	u_n[i] = new double [N];
 	v_n[i] = new double [N];
@@ -103,8 +105,8 @@ void runParallel(double time, double dt, int N_write, int argc, char** argv, dou
     {
 	for (j = 0; j < N; j++)
 	{
-	    u_n[i][j] = 0.0;
-	    v_n[i][j] = 0.0;
+	    u_o[i][j] = 0.0;
+	    v_o[i][j] = 0.0;
 	}
     }
 
@@ -128,28 +130,25 @@ void runParallel(double time, double dt, int N_write, int argc, char** argv, dou
 	m2 = n_ex + (PID+1)*M;
     }
 
+    MPI_l0(eta_l,m1,m2);
+    MPI_l0(u_n,m1,m2);
+    MPI_l0(v_n,m1,m2);
+    MPI_Barrier(MPI_COMM_WORLD);
+
     chrono::time_point<chrono::steady_clock> begin_time = chrono::steady_clock::now(); 
 
     for (i = 0; i < Nt+1; i++)
     {
-	momentum(eta_o,eta_n,u_o,v_o,dt,m1,m2);
+	momentum(eta_o,eta_l,u_o,v_o,dt,m1,m2);
 	MPI_Barrier(MPI_COMM_WORLD);
+	MPI_copy(eta_l,eta_g);
 
-	saint_venant(u_o,u_n,eta_o,eta_n,v_o,v_n,dt,m1,m2);
+	saint_venant(u_o,u_n,eta_o,eta_g,v_o,v_n,dt,m1,m2);
 	MPI_Barrier(MPI_COMM_WORLD);
+	MPI_copy(u_n, u_o);
+	MPI_copy(v_n, v_o);
 
-	if (PID == 0)
-	{
-	    a_copy(eta_n,eta_o);
-	    a_copy(u_n,u_o);
-	    a_copy(v_n,v_o);
-
-	    if (i%N_write == 0)
-	    {
-	    	writet(eta_o, dt*i*10);
-	    }
-	}
-	MPI_Barrier(MPI_COMM_WORLD);
+	a_copy(eta_g,eta_o);
     }
 
     chrono::time_point<chrono::steady_clock>end_time = chrono::steady_clock::now();
